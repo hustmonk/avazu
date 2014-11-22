@@ -44,9 +44,14 @@ from math import exp, log, sqrt
 ##############################################################################
 
 # A, paths
+TEST_MODE = 0
 dir = "../data/"
-train = dir + 'train1029'               # path to training file
-test = dir + 'valid1030'                 # path to testing file
+if TEST_MODE:
+    train = dir + 'train1029'               # path to training file
+    test = dir + 'valid1030'                 # path to testing file
+else:
+    train = dir + 'train'               # path to training file
+    test = dir + 'test'                 # path to testing file
 submission = 'submission1234.csv'  # path of to be outputted submission file
 newstam = datetime.now()
 
@@ -57,7 +62,7 @@ L1 = 1.     # L1 regularization, larger value means more regularized
 L2 = 1.     # L2 regularization, larger value means more regularized
 
 # C, feature/hash trick
-D = 2 ** 20             # number of weights to use
+D = 2 ** 24             # number of weights to use
 interaction = False     # whether to enable poly2 feature interactions
 
 # D, training/validation
@@ -98,6 +103,7 @@ class ftrl_proximal(object):
         # w: lazy weights
         self.n = [0.] * D
         self.z = [0.] * D
+        self.c = [0.] * D
         self.w = {}
 
     def _indices(self, x):
@@ -195,9 +201,15 @@ class ftrl_proximal(object):
 
         # update z and n
         for i in self._indices(x):
+            self.c[i] += 1
             sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
             z[i] += g - sigma * w[i]
             n[i] += g * g
+
+    def printc(self):
+        for i in self._indices(x):
+            if self.c[i] > 100:
+                print i
 
 
 def logloss(p, y):
@@ -305,9 +317,10 @@ for e in xrange(epoch):
             count += 1
             if count % 50000 == 0:
                 loss1 = 0
-                for (x1, y1) in valid_test:
-                    p1 = learner.predict(x1)
-                    loss1 += logloss(p1, y1)
+                if TEST_MODE:
+                    for (x1, y1) in valid_test:
+                        p1 = learner.predict(x1)
+                        loss1 += logloss(p1, y1)
 
                 logger.info('[%s]Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (newstam, e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
@@ -325,7 +338,8 @@ with open(submission, 'w') as outfile:
     for t, date, ID, x, y in data(test, D):
         p = learner.predict(x)
         outfile.write('%s,%s\n' % (ID, str(p)))
-        loss += logloss(p, y)
-        count += 1
-        if count % 50000 == 0:
+        if TEST_MODE:
+            loss += logloss(p, y)
+            count += 1
+            if count % 50000 == 0:
                 logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))
