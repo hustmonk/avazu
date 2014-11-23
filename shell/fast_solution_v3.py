@@ -8,10 +8,15 @@
 __revision__ = '0.1'
 import logging
 import logging.config
+from datetime import datetime
 
 logging.config.fileConfig("log.conf")
 
+newstam = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+LOG_FILE = 'log/tst.log' + newstam
+handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
 logger = logging.getLogger("example")
+logger.addHandler(handler)
 
 '''
            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
@@ -30,7 +35,6 @@ as the name is changed.
 '''
 
 
-from datetime import datetime
 from csv import DictReader
 from math import exp, log, sqrt
 
@@ -44,16 +48,17 @@ from math import exp, log, sqrt
 ##############################################################################
 
 # A, paths
-TEST_MODE = 0
+TEST_MODE = 1
 dir = "../data/"
 if TEST_MODE:
     train = dir + 'train1029'               # path to training file
     test = dir + 'valid1030'                 # path to testing file
+    debug = dir + 'debug'
 else:
     train = dir + 'train'               # path to training file
-    test = dir + 'test'                 # path to testing file
+    test = dir + 'test'                # path to testing file
+    debug = dir + 'debug'
 submission = 'submission1234.csv'  # path of to be outputted submission file
-newstam = datetime.now()
 
 # B, model
 alpha = .1  # learning rate
@@ -284,7 +289,7 @@ start = datetime.now()
 # initialize ourselves a learner
 learner = ftrl_proximal(alpha, beta, L1, L2, D, interaction)
 valid_test = []
-for t, date, ID, x, y in data(test, D, 100000):
+for t, date, ID, x, y in data(debug, D, 100000):
     valid_test.append([x, y])
 
 
@@ -322,10 +327,10 @@ for e in xrange(epoch):
                         p1 = learner.predict(x1)
                         loss1 += logloss(p1, y1)
 
-                logger.info('[%s]Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (newstam, e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
+                logger.info('Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
 
-    logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))
+    logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
 
 
 ##############################################################################
@@ -342,4 +347,4 @@ with open(submission, 'w') as outfile:
             loss += logloss(p, y)
             count += 1
             if count % 50000 == 0:
-                logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))
+                logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
