@@ -276,7 +276,6 @@ def data(path, D, Limit = 10000000000):
             # one-hot encode everything with hash trick
             index = abs(hash(key + '_' + value)) % D
             x.append(index)
-
         yield t, date, ID, x, y
 
 
