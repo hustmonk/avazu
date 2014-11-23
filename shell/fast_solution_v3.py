@@ -66,7 +66,7 @@ D = 2 ** 24             # number of weights to use
 interaction = False     # whether to enable poly2 feature interactions
 
 # D, training/validation
-epoch = 1       # learn training data for N passes
+epoch = 3       # learn training data for N passes
 holdafter = 9   # data after date N (exclusive) are used as validation
 holdout = None  # use every N training instance for holdout validation
 
