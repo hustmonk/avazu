@@ -8,17 +8,18 @@
 __revision__ = '0.1'
 import logging
 import logging.config
+import math
 from datetime import datetime
-import sys
+from densy import *
 
 logging.config.fileConfig("log.conf")
+denesy = Denesy()
 
 newstam = datetime.now().strftime('%d-%H-%M-%S')
 LOG_FILE = 'log/tst.log' + newstam
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
 logger = logging.getLogger("example")
 logger.addHandler(handler)
-logger.info(sys.argv[1])
 
 '''
            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
@@ -37,7 +38,6 @@ as the name is changed.
 '''
 
 
-from datetime import datetime
 from csv import DictReader
 from math import exp, log, sqrt
 
@@ -53,21 +53,17 @@ from math import exp, log, sqrt
 # A, paths
 TEST_MODE = 0
 dir = "../data/"
-post = ".more3"
+post = ".less3"
 if TEST_MODE:
-    post = ".more3"
-    train = dir + 'train1029.rand' + post               # path to training file
-    #train = dir + 'train1029.rand'               # path to training file
+    post = ".less3"
+    train = dir + 'train1029.rand' + ".less3"              # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
     debug = dir + 'debug' + post
-
-
 else:
-    train = dir + 'train' + post              # path to training file
-    test = dir + 'test' + post                 # path to testing file
+    train = dir + 'train'              # path to training file
+    test = dir + 'test' + post               # path to testing file
     debug = dir + 'debug' + post
 submission = 'submission1234.csv' + post  # path of to be outputted submission file
-newstam = datetime.now()
 
 # B, model
 alpha = .1  # learning rate
@@ -189,7 +185,7 @@ class ftrl_proximal(object):
         # bounded sigmoid function, this is the probability estimation
         return 1. / (1. + exp(-max(min(wTx, 35.), -35.)))
 
-    def update(self, x, p, y):
+    def update(self, x, p, y, weight):
         ''' Update model using x, p, y
 
             INPUT:
@@ -217,8 +213,8 @@ class ftrl_proximal(object):
         for i in self._indices(x):
             self.c[i] += 1
             sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
-            z[i] += g - sigma * w[i]
-            n[i] += g * g
+            z[i] += (g - sigma * w[i]) * weight
+            n[i] += (g * g) * weight
 
     def printc(self):
         for i in self._indices(x):
@@ -279,15 +275,32 @@ def data(path, D, Limit = 10000000000):
 
         # build x
         x = []
-        #del row["device_ip"]
+        weight = math.sqrt(1.0 / denesy.getNum("device_ip", row["device_ip"]))
+        del row['hour']
+        del row["device_ip"]
+        del row["device_id"]
         for key in row:
             value = row[key]
 
             # one-hot encode everything with hash trick
             index = abs(hash(key + '_' + value)) % D
             x.append(index)
-
-        yield t, date, ID, x, y
+            """
+            if key == "device_ip" or key == "device_id":
+                v = denesy.getNum(key, value)
+                index = abs(hash(key + 'X_' + str(v))) % D
+                x.append(index)
+            """
+        """
+        ip_num = denesy.getNum("device_ip", row["device_ip"])
+        id_num = denesy.getNum("device_id", row["device_id"])
+        other = 1
+        if ip_num > 5 and id_num > 5:
+            other = abs(hash(row["device_ip"] + row["device_id"])) % D
+        x.append(other)
+        """
+        #weight = 1
+        yield t, date, ID, x, y, weight
 
 
 ##############################################################################
@@ -298,17 +311,17 @@ start = datetime.now()
 
 # initialize ourselves a learner
 learner = ftrl_proximal(alpha, beta, L1, L2, D, interaction)
-
 valid_test = []
-for t, date, ID, x, y in data(debug, D, 100000):
+for t, date, ID, x, y, weight in data(debug, D, 100000):
     valid_test.append([x, y])
+
 
 # start training
 for e in xrange(epoch):
     loss = 0.
     count = 0
 
-    for t, date, ID, x, y in data(train, D):  # data is a generator
+    for t, date, ID, x, y, weight in data(train, D):  # data is a generator
         #    t: just a instance counter
         # date: you know what this is
         #   ID: id provided in original data
@@ -317,7 +330,7 @@ for e in xrange(epoch):
 
         # step 1, get prediction from learner
         p = learner.predict(x)
-        learner.update(x, p, y)
+        learner.update(x, p, y, weight)
 
         if (holdafter and date > holdafter) or (holdout and t % holdout == 0):
             # step 2-1, calculate validation loss
@@ -340,7 +353,7 @@ for e in xrange(epoch):
                 logger.info('Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
 
-    logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % (e, loss/count, str(datetime.now() - start)))
+    logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
 
 
 ##############################################################################
@@ -350,11 +363,11 @@ loss = 0
 count = 0
 with open(submission, 'w') as outfile:
     outfile.write('id,click\n')
-    for t, date, ID, x, y in data(test, D):
+    for t, date, ID, x, y, weight in data(test, D):
         p = learner.predict(x)
         outfile.write('%s,%s\n' % (ID, str(p)))
         if TEST_MODE:
             loss += logloss(p, y)
             count += 1
             if count % 50000 == 0:
-                logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))
+                logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
