@@ -29,7 +29,7 @@ def write(fin_name):
     for line in fin:
         arr = line.strip().split(",")
         key = "device_ip_" + arr[device_ip_idx]
-        if key_idx[key] > 5:
+        if key_idx[key] > 10:
             foutmore3.write(line)
         else:
             foutless3.write(line)

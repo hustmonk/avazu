@@ -10,11 +10,13 @@ import logging
 import logging.config
 from datetime import datetime
 import sys
+from densy import *
+denesy = Denesy()
 
 logging.config.fileConfig("log.conf")
 
 newstam = datetime.now().strftime('%d-%H-%M-%S')
-LOG_FILE = 'log/tst.log' + newstam
+LOG_FILE = 'logm/tst.log' + newstam
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
 logger = logging.getLogger("example")
 logger.addHandler(handler)
@@ -60,12 +62,14 @@ if TEST_MODE:
     #train = dir + 'train1029.rand'               # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
     debug = dir + 'debug' + post
+    epoch = 1       # learn training data for N passes
 
 
 else:
     train = dir + 'train' + post              # path to training file
     test = dir + 'test' + post                 # path to testing file
     debug = dir + 'debug' + post
+    epoch = 3       # learn training data for N passes
 submission = 'submission1234.csv' + post  # path of to be outputted submission file
 newstam = datetime.now()
 
@@ -80,7 +84,6 @@ D = 2 ** 24             # number of weights to use
 interaction = False     # whether to enable poly2 feature interactions
 
 # D, training/validation
-epoch = 3       # learn training data for N passes
 holdafter = 9   # data after date N (exclusive) are used as validation
 holdout = None  # use every N training instance for holdout validation
 
@@ -145,7 +148,7 @@ class ftrl_proximal(object):
                     # one-hot encode interactions with hash trick
                     yield abs(hash(str(x[i]) + '_' + str(x[j]))) % D
 
-    def predict(self, x):
+    def predict(self, x, train):
         ''' Get probability estimation on x
 
             INPUT:
@@ -280,11 +283,14 @@ def data(path, D, Limit = 10000000000):
         # build x
         x = []
         #del row["device_ip"]
+        app_category = row["app_category"]
+        if denesy.getNum("app_category", app_category) < 1000:
+            app_category = "XXXY"
         for key in row:
             value = row[key]
 
             # one-hot encode everything with hash trick
-            index = abs(hash(key + '_' + value)) % D
+            index = abs(hash(app_category+"_" + key + '_' + value)) % D
             x.append(index)
 
         yield t, date, ID, x, y
@@ -316,7 +322,7 @@ for e in xrange(epoch):
         #    y: label (click)
 
         # step 1, get prediction from learner
-        p = learner.predict(x)
+        p = learner.predict(x, True)
         learner.update(x, p, y)
 
         if (holdafter and date > holdafter) or (holdout and t % holdout == 0):
@@ -334,7 +340,7 @@ for e in xrange(epoch):
                 loss1 = 0
                 if TEST_MODE:
                     for (x1, y1) in valid_test:
-                        p1 = learner.predict(x1)
+                        p1 = learner.predict(x1, False)
                         loss1 += logloss(p1, y1)
 
                 logger.info('Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
@@ -351,7 +357,7 @@ count = 0
 with open(submission, 'w') as outfile:
     outfile.write('id,click\n')
     for t, date, ID, x, y in data(test, D):
-        p = learner.predict(x)
+        p = learner.predict(x, False)
         outfile.write('%s,%s\n' % (ID, str(p)))
         if TEST_MODE:
             loss += logloss(p, y)

@@ -16,6 +16,6 @@ class Denesy():
     def getNum(self, head, v):
         key = head + "_" + v
         c = self.dict.get(key, 1)
-        if c > 100:
-            c = 101
+        #if c > 100:
+        #    c = 101
         return c

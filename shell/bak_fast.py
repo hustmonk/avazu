@@ -59,10 +59,12 @@ if TEST_MODE:
     train = dir + 'train1029.rand' + ".less3"              # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
     debug = dir + 'debug' + post
+    epoch = 1       # learn training data for N passes
 else:
     train = dir + 'train'              # path to training file
     test = dir + 'test' + post               # path to testing file
     debug = dir + 'debug' + post
+    epoch = 3       # learn training data for N passes
 submission = 'submission1234.csv' + post  # path of to be outputted submission file
 
 # B, model
@@ -76,7 +78,6 @@ D = 2 ** 24             # number of weights to use
 interaction = False     # whether to enable poly2 feature interactions
 
 # D, training/validation
-epoch = 3       # learn training data for N passes
 holdafter = 9   # data after date N (exclusive) are used as validation
 holdout = None  # use every N training instance for holdout validation
 
@@ -279,11 +280,14 @@ def data(path, D, Limit = 10000000000):
         del row['hour']
         del row["device_ip"]
         del row["device_id"]
+        app_category = row["app_category"]
+        if denesy.getNum("app_category", app_category) < 1000:
+            app_category = "XXXY"
         for key in row:
             value = row[key]
 
             # one-hot encode everything with hash trick
-            index = abs(hash(key + '_' + value)) % D
+            index = abs(hash(app_category + "_" + key + '_' + value)) % D
             x.append(index)
             """
             if key == "device_ip" or key == "device_id":
