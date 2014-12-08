@@ -11,61 +11,35 @@ import logging.config
 import math
 from datetime import datetime
 from densy import *
+from csv import DictReader
+from math import exp, log, sqrt
 
 logging.config.fileConfig("log.conf")
 denesy = Denesy()
 
-newstam = datetime.now().strftime('%d-%H-%M-%S')
-LOG_FILE = 'log/tst.log' + newstam
-handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
-logger = logging.getLogger("example")
-logger.addHandler(handler)
-
-'''
-           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                   Version 2, December 2004
-
-Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
-
-Everyone is permitted to copy and distribute verbatim or modified
-copies of this license document, and changing it is allowed as long
-as the name is changed.
-
-           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
- 0. You just DO WHAT THE FUCK YOU WANT TO.
-'''
-
-
-from csv import DictReader
-from math import exp, log, sqrt
-
-
-# TL; DR, the main training process starts on line: 250,
-# you may want to start reading the code from there
-
-
-##############################################################################
-# parameters #################################################################
-##############################################################################
-
-# A, paths
-TEST_MODE = 0
+TEST_MODE = 1
 dir = "../data/"
 post = ".less3"
+newstam = datetime.now().strftime('%d-%H-%M-%S')
 if TEST_MODE:
     post = ".less3"
     train = dir + 'train1029.rand' + ".less3"              # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
     debug = dir + 'debug' + post
+    LOG_FILE = 'dlog/tst.log' + newstam
     epoch = 1       # learn training data for N passes
 else:
     train = dir + 'train'              # path to training file
     test = dir + 'test' + post               # path to testing file
     debug = dir + 'debug' + post
+    LOG_FILE = 'log/tst.log' + newstam
     epoch = 3       # learn training data for N passes
+
 submission = 'submission1234.csv' + post  # path of to be outputted submission file
+handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
+logger = logging.getLogger("example")
+logger.addHandler(handler)
+
 
 # B, model
 alpha = .1  # learning rate
@@ -239,19 +213,6 @@ def logloss(p, y):
 
 
 def data(path, D, Limit = 10000000000):
-    ''' GENERATOR: Apply hash-trick to the original csv row
-                   and for simplicity, we one-hot-encode everything
-
-        INPUT:
-            path: path to training or testing file
-            D: the max index that we can hash to
-
-        YIELDS:
-            ID: id of the instance, mainly useless
-            x: a list of hashed and one-hot-encoded 'indices'
-               we only need the index since all values are either 0 or 1
-            y: y = 1 if we have a click, else we have y = 0
-    '''
     cc = 0
     for t, row in enumerate(DictReader(open(path))):
         cc += 1
