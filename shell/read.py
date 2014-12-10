@@ -11,14 +11,14 @@ from csv import DictReader
 from math import exp, log, sqrt
 import math
 from densy import *
+import random
 
 denesy = Denesy()
-def data(path, D, Limit = 10000000000):
+dropout = 0.9
+def data(path, D, train):
     cc = 0
     for t, row in enumerate(DictReader(open(path))):
         cc += 1
-        if cc > Limit:
-            break
         # process id
         ID = row['id']
         del row['id']
@@ -45,12 +45,19 @@ def data(path, D, Limit = 10000000000):
         app_category = row["app_category"]
         if denesy.getNum("app_category", app_category) < 1000:
             app_category = "XXXY"
+        C16 = row["C16"]
+        if denesy.getNum("C16", C16) < 1000:
+            C16 = "CCCY"
         for key in row:
             value = row[key]
 
             # one-hot encode everything with hash trick
             index = abs(hash(app_category + "_" + key + '_' + value)) % D
             x.append(index)
+            """
+            index = abs(hash(C16 + "_" + key + '_' + value)) % D
+            x.append(index)
+            """
             """
             if key == "device_ip" or key == "device_id":
                 v = denesy.getNum(key, value)

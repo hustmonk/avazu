@@ -15,11 +15,11 @@ class Valid:
         debug1 = dir + 'debug1030' + post
         debug2 = dir + 'debug1029' + post
         self.valid_test_2 = []
-        for t, date, ID, x, y, weight in data(debug2, D, 100000):
+        for t, date, ID, x, y, weight in data(debug2, D, False):
             self.valid_test_2.append([x, y])
 
         self.valid_test_1 = []
-        for t, date, ID, x, y, weight in data(debug1, D, 100000):
+        for t, date, ID, x, y, weight in data(debug1, D, False):
             self.valid_test_1.append([x, y])
 
     def _loss(self, learner, data):

@@ -6,6 +6,7 @@
 """
 from config import *
 from math import exp, log, sqrt
+import random
 __revision__ = '0.1'
 # B, model
 alpha = .1  # learning rate
@@ -136,9 +137,14 @@ class ftrl_proximal(object):
 
         # gradient under logloss
         g = p - y
+        dropout = 0.9
 
         # update z and n
         for i in self._indices(x):
+            """
+            if random.random() > dropout:
+                continue
+            """
             self.c[i] += 1
             sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
             z[i] += (g - sigma * w[i]) * weight

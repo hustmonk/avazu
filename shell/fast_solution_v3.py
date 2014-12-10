@@ -56,8 +56,8 @@ from math import exp, log, sqrt
 TEST_MODE = 0
 dir = "../data/"
 post = ".more3"
+post = ""
 if TEST_MODE:
-    post = ".more3"
     train = dir + 'train1029.rand' + post               # path to training file
     #train = dir + 'train1029.rand'               # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
@@ -352,15 +352,15 @@ for e in xrange(epoch):
 ##############################################################################
 # start testing, and build Kaggle's submission file ##########################
 ##############################################################################
-loss = 0
-count = 0
-with open(submission, 'w') as outfile:
-    outfile.write('id,click\n')
-    for t, date, ID, x, y in data(test, D):
-        p = learner.predict(x, False)
-        outfile.write('%s,%s\n' % (ID, str(p)))
-        if TEST_MODE:
-            loss += logloss(p, y)
-            count += 1
-            if count % 50000 == 0:
-                logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))
+    loss = 0
+    count = 0
+    with open(submission +"."+ str(e), 'w') as outfile:
+        outfile.write('id,click\n')
+        for t, date, ID, x, y in data(test, D):
+            p = learner.predict(x, False)
+            outfile.write('%s,%s\n' % (ID, str(p)))
+            if TEST_MODE:
+                loss += logloss(p, y)
+                count += 1
+                if count % 50000 == 0:
+                    logger.info('time[%s]Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( newstam, e, loss/count, str(datetime.now() - start)))

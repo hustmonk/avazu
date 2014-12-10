@@ -17,9 +17,10 @@ from valid import *
 
 logging.config.fileConfig("log.conf")
 
-TEST_MODE = 1
+TEST_MODE = 0
 dir = "../data/"
 post = ".less3"
+post = ""
 newstam = datetime.now().strftime('%d-%H-%M-%S')
 valid = Valid(post)
 if TEST_MODE:
@@ -49,7 +50,7 @@ for e in xrange(epoch):
     loss = 0.
     count = 0
 
-    for t, date, ID, x, y, weight in data(train, D):  # data is a generator
+    for t, date, ID, x, y, weight in data(train, D, True):  # data is a generator
         p = learner.predict(x)
         learner.update(x, p, y, weight)
 
@@ -62,7 +63,6 @@ for e in xrange(epoch):
                     l1,l2,lx = valid.loss(learner)
 
                 logger.info('Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f], elapsed time: %s' % (e, count, date, loss/count, l1, l2, lx, str(datetime.now() - start)))
-                break
             # step 2-2, update learner with label (click) information
 
     logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
@@ -76,7 +76,7 @@ def predictR(testfile):
     count = 0
     with open(submission, 'w') as outfile:
         outfile.write('id,click\n')
-        for t, date, ID, x, y, weight in data(testfile, D):
+        for t, date, ID, x, y, weight in data(testfile, D, False):
             p = learner.predict(x)
             outfile.write('%s,%s\n' % (ID, str(p)))
             if TEST_MODE:
@@ -84,6 +84,7 @@ def predictR(testfile):
                 count += 1
                 if count % 50000 == 0:
                     logger.info('validation[%s] logloss: %f, elapsed time: %s' % ( testfile, loss/count, str(datetime.now() - start)))
+    logger.info('VVvalidation[%s] logloss: %f, elapsed time: %s' % ( testfile, loss/count, str(datetime.now() - start)))
 
 if TEST_MODE:
     predictR(test1)
