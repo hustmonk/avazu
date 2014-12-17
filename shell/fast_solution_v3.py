@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+open#!/usr/bin/env python
 # -*- coding: GB2312 -*-
 # Last modified: 
 
@@ -53,12 +53,12 @@ from math import exp, log, sqrt
 ##############################################################################
 
 # A, paths
-TEST_MODE = 0
+TEST_MODE = 1
 dir = "../data/"
 post = ".more3"
 post = ""
 if TEST_MODE:
-    train = dir + 'train1029.rand' + post               # path to training file
+    train = dir + 'train1028.rand' + post               # path to training file
     #train = dir + 'train1029.rand'               # path to training file
     test = dir + 'valid1030' + post                 # path to testing file
     debug = dir + 'debug' + post
@@ -167,7 +167,7 @@ class ftrl_proximal(object):
         # model
         n = self.n
         z = self.z
-        w = {}
+        w = []
 
         # wTx is the inner product of w and x
         wTx = 0.
@@ -177,16 +177,18 @@ class ftrl_proximal(object):
             # build w on the fly using z and n, hence the name - lazy weights
             # we are doing this at prediction instead of update time is because
             # this allows us for not storing the complete w
+            wi = 0
             if sign * z[i] <= L1:
                 # w[i] vanishes due to L1 regularization
-                w[i] = 0.
+                wi = 0.
             else:
                 # apply prediction time L1, L2 regularization to z and get w
-                w[i] = (sign * L1 - z[i]) / ((beta + sqrt(n[i])) / alpha + L2)
+                wi = (sign * L1 - z[i]) / ((beta + sqrt(n[i])) / alpha + L2)
 
-            wTx += w[i]
+            wTx += self.z[i]
+            w.append([i, wi])
 
-        # cache the current w for update stage
+        # cache the current w for update v
         self.w = w
 
         # bounded sigmoid function, this is the probability estimation
@@ -216,12 +218,15 @@ class ftrl_proximal(object):
         # gradient under logloss
         g = p - y
 
+        weight = 1
+        if y == 0:
+            weight = 0.3
         # update z and n
-        for i in self._indices(x):
+        for [i, wi] in self.w:
             self.c[i] += 1
-            sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
-            z[i] += g - sigma * w[i]
-            n[i] += g * g
+            #sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
+            z[i] -= g * alpha / (sqrt(n[i]) + 1.)
+            n[i] += 1
 
     def printc(self):
         for i in self._indices(x):

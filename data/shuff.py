@@ -12,7 +12,7 @@ for i in range(10):
     fout = open("bak/"+str(i), "w")
     fouts.append(fout)
 count = 0
-fin = open("train1029")
+fin = open("train")
 fin.next()
 for line in fin:
     fouts[count%10].write(line)

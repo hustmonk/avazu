@@ -15,6 +15,13 @@ import random
 
 denesy = Denesy()
 dropout = 0.9
+def getXY(row):
+    key = "site_category"
+    value = row[key]
+    if denesy.getNum(key, value) < 300:
+        return key
+    else:
+        return value
 def data(path, D, train):
     cc = 0
     for t, row in enumerate(DictReader(open(path))):
@@ -42,17 +49,15 @@ def data(path, D, train):
         del row['hour']
         del row["device_ip"]
         del row["device_id"]
-        app_category = row["app_category"]
-        if denesy.getNum("app_category", app_category) < 1000:
-            app_category = "XXXY"
         C16 = row["C16"]
         if denesy.getNum("C16", C16) < 1000:
             C16 = "CCCY"
+        xy = getXY(row)
         for key in row:
             value = row[key]
 
             # one-hot encode everything with hash trick
-            index = abs(hash(app_category + "_" + key + '_' + value)) % D
+            index = abs(hash(xy + "_" + key + '_' + value)) % D
             x.append(index)
             """
             index = abs(hash(C16 + "_" + key + '_' + value)) % D

@@ -6,6 +6,8 @@
 """
 
 __revision__ = '0.1'
+from densy import *
+densy = Denesy()
 class SplitType:
     def __init__(self):
         self.D = 2 ** 30             # number of weights to use
@@ -21,6 +23,7 @@ class SplitType:
             self.count[arr[0]] = count
 
     def set_head(self, head):
+        self.head = head
         for i in range(len(head)):
             key = head[i]
             if key not in self.count:
@@ -38,15 +41,10 @@ class SplitType:
     def _feature(self, dict, info):
         buff = []
         for k in dict:
-            #v = abs(hash(str(k) + '_' + info[k])) % self.D
-            if k == 2:
-                v = str(k) + '_' + info[k][6:]
-                buff.append("%s" % v)
-                v = str(k) + 'x_' + str(int(info[k][4:6])%7)
-                buff.append("%s" % v)
-            else:
-                v = str(k) + '_' + info[k]
-                buff.append("%s" % v)
+            k = densy.getNum(self.head[k], info[k])
+            if k < 0:
+                continue
+            buff.append("%d" % k)
         return " ".join(buff)
 
     def get_feature(self, info):
@@ -74,6 +72,7 @@ def write(fin, fout):
         fout.write("%s %s|%s\n" % (label, arr[0], feature))
     fout.close()
 
-write("../data/train1029.rand", "train.csv")
+write("../data/train1028.rand", "train.csv")
+write("../data/valid1029", "test.csv.29")
 write("../data/valid1030", "test.csv")
     
