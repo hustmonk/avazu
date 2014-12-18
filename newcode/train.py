@@ -16,7 +16,7 @@ from ensemble import *
 
 logging.config.fileConfig("log.conf")
 
-TEST_MODE = 1
+TEST_MODE = 0
 dir = "../data/"
 newstam = datetime.now().strftime('%d-%H-%M-%S')
 valid = Valid()
@@ -30,7 +30,7 @@ else:
     train = dir + 'train'              # path to training file
     test = dir + 'test'               # path to testing file
     LOG_FILE = 'logsub/tst.log' + newstam
-    epoch = 2       # learn training data for N passes
+    epoch = 3       # learn training data for N passes
 
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
 logger = logging.getLogger("example")

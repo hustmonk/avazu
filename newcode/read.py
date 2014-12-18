@@ -37,10 +37,9 @@ class Feature:
             self.data.append(index)
         if denesy.getNum("device_ip", row["device_ip"]) < 10:
             self.isMore = False
-            self.weight = math.sqrt(1.0 / denesy.getNum("device_ip", row["device_ip"]))
         else:
             self.isMore = True
-            self.weight = 1
+        self.weight = math.sqrt(1.0 / denesy.getNum("device_ip", row["device_ip"]))
 
 def data(path, D, train):
     cc = 0

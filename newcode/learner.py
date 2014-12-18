@@ -25,7 +25,7 @@ class ftrl_proximal(object):
         http://www.eecs.tufts.edu/~dsculley/papers/ad-click-prediction.pdf
     '''
 
-    def __init__(self, argv):
+    def __init__(self, argv, more):
         # parameters
         self.count = 0
         alpha, beta, L1, L2, D, interaction = argv
@@ -34,6 +34,7 @@ class ftrl_proximal(object):
         self.L1 = L1
         self.L2 = L2
         self.start = False
+        self.more = more
 
         # feature related parameters
         self.D = D
@@ -103,6 +104,8 @@ class ftrl_proximal(object):
                 self.n: increase by squared gradient
                 self.z: weights
         '''
+        if self.more:
+            weight = 1
         self.count += 1
 
         # parameter

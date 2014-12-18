@@ -27,6 +27,7 @@ class M1:
         preds = [float(k)  for k in arr[3:]]
 
         preda = preds[0]
+        return [preda]
         predm = preds[1]
         
         predl = preds[2]
@@ -50,7 +51,7 @@ for line in fin:
     for i in range(len(preds)):
         loss[i] += logloss(preds[i], y)
     c += 1
-    fout.write("%s,%f\n" % (arr[0], preds[2]))
+    fout.write("%s,%f\n" % (arr[0], preds[0]))
 loss = ["%.4f" % (k/c) for k in loss]
 fout.close()
 logger.info("%s", ",".join(loss))
