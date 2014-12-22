@@ -9,6 +9,7 @@ __revision__ = '0.1'
 
 
 import math
+import sys
 from math import exp, log, sqrt
 
 # C, feature/hash trick

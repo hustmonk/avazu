@@ -171,6 +171,7 @@ class ftrl_proximal(object):
 
         # wTx is the inner product of w and x
         wTx = 0.
+        kl=0
         for i in self._indices(x):
             sign = -1. if z[i] < 0 else 1.  # get sign of z[i]
 
@@ -184,6 +185,7 @@ class ftrl_proximal(object):
             else:
                 # apply prediction time L1, L2 regularization to z and get w
                 wi = (sign * L1 - z[i]) / ((beta + sqrt(n[i])) / alpha + L2)
+                kl += 1
 
             wTx += self.z[i]
             w.append([i, wi])
@@ -229,9 +231,11 @@ class ftrl_proximal(object):
             n[i] += 1
 
     def printc(self):
-        for i in self._indices(x):
-            if self.c[i] > 100:
-                print i
+        k = 0
+        for i in self.z:
+            if i > 1 or i < -1:
+                k += 1
+        print k
 
 
 def logloss(p, y):
@@ -346,9 +350,11 @@ for e in xrange(epoch):
                 if TEST_MODE:
                     for (x1, y1) in valid_test:
                         p1 = learner.predict(x1, False)
+                        print p1,y1
                         loss1 += logloss(p1, y1)
 
                 logger.info('Epoch %d finished[%d][%d], validation logloss: %f, test : %f, elapsed time: %s' % (e, count, date, loss/count, loss1/len(valid_test), str(datetime.now() - start)))
+                learner.printc()
             # step 2-2, update learner with label (click) information
 
     logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % (e, loss/count, str(datetime.now() - start)))

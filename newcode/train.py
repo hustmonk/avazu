@@ -13,8 +13,10 @@ from learner import *
 from read import *
 from valid import *
 from ensemble import *
+import sys
 
 logging.config.fileConfig("log.conf")
+where=sys.argv[1]
 
 TEST_MODE = 0
 dir = "../data/"
@@ -58,10 +60,10 @@ for e in xrange(epoch):
             if TEST_MODE:
                 l1,l2,lx = valid.loss(learner)
 
-            logger.info('Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f], elapsed time: %s' % (e, count, date, loss/count, l1, l2, lx, str(datetime.now() - start)))
+            logger.info('[%s] Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f], elapsed time: %s' % (where, e, count, date, loss/count, l1, l2, lx, str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
 
-    logger.info('Epoch %d finished, validation logloss: %f, elapsed time: %s' % ( e, loss/count, str(datetime.now() - start)))
+    logger.info('[%s] Epoch %d finished, validation logloss: %f, elapsed time: %s' % (where, e, loss/count, str(datetime.now() - start)))
 
 
 ##############################################################################
@@ -80,8 +82,8 @@ def predictR(testfile, submission):
                 loss += logloss(p, y)
                 count += 1
                 if count % 50000 == 0:
-                    logger.info('validation[%s] logloss: %f, elapsed time: %s' % ( testfile, loss/count, str(datetime.now() - start)))
-    logger.info('VVvalidation[%s] logloss: %f, elapsed time: %s' % ( testfile, loss/count, str(datetime.now() - start)))
+                    logger.info('[%s]validation[%s] logloss: %f, elapsed time: %s' % (where, testfile, loss/count, str(datetime.now() - start)))
+    logger.info('[%s]VVvalidation[%s] logloss: %f, elapsed time: %s' % (where, testfile, loss/count, str(datetime.now() - start)))
 
 learner.pr()
 if TEST_MODE:

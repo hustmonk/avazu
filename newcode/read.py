@@ -10,22 +10,24 @@ from config import *
 from csv import DictReader
 from math import exp, log, sqrt
 import math
+import sys
 from densy import *
 import random
 
 denesy = Denesy()
 dropout = 0.9
-def getBiFeature(key, row):
-    value = row[key]
-    if denesy.getNum(key, value) < 300:
+def getBiFeature(key, cckey):
+    if cckey < 300:
         return key
     else:
-        return value
+        return str(cckey)
 
 class Feature:
     def __init__(self, row):
         self.data = [0]
-        xy = getBiFeature("app_category", row)
+        quKey = sys.argv[1]
+        cckey = denesy.getNum(quKey, row[quKey])
+        xy = getBiFeature(quKey, cckey)
         self.dayIndex = int(row['hour'][4:6])-21
         row['hour'] = row['hour'][6:]
         for (key,value) in row.items():
@@ -35,11 +37,11 @@ class Feature:
             else:
                 index = abs(hash(xy + "_" + key + '_' + value)) % D
             self.data.append(index)
-        if denesy.getNum("device_ip", row["device_ip"]) < 10:
+        if cckey < 10:
             self.isMore = False
         else:
             self.isMore = True
-        self.weight = math.sqrt(1.0 / denesy.getNum("device_ip", row["device_ip"]))
+        self.weight = math.sqrt(1.0 / cckey)
 
 def data(path, D, train):
     cc = 0
