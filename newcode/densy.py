@@ -21,9 +21,9 @@ class Denesy():
         for line in open("../todensy/0"):
             arr = line.strip().split("\t")
             if arr[0] in k:
-                print arr[0]
-                continue
-            self.counts[arr[0]] = int(arr[1])
+                self.counts[arr[0]] = -int(arr[1])
+            else:
+                self.counts[arr[0]] = int(arr[1])
             self.indexs[arr[0]] = len(self.indexs)
 
     def getNum(self, head, v):

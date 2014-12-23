@@ -37,6 +37,8 @@ class Feature:
             else:
                 index = abs(hash(xy + "_" + key + '_' + value)) % D
             self.data.append(index)
+        if cckey < 0:
+            cckey = -cckey
         if cckey < 10:
             self.isMore = False
         else:
