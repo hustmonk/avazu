@@ -37,3 +37,7 @@ class Ensemble():
     def pr(self):
         self.learnMore.pr()
         self.learnLess.pr()
+
+    def printr(self):
+        self.learnMore.printr()
+        self.learnLess.printr()

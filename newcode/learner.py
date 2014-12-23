@@ -35,6 +35,10 @@ class ftrl_proximal(object):
         self.L2 = L2
         self.start = False
         self.more = more
+        """
+        if more == False:
+            self.L1 = self.L1 / 2.0
+        """
 
         # feature related parameters
         self.D = D
@@ -106,6 +110,8 @@ class ftrl_proximal(object):
         '''
         if self.more:
             weight = 1
+        if weight < 0.01:
+            weight = 0.01
         self.count += 1
 
         # parameter
@@ -133,3 +139,10 @@ class ftrl_proximal(object):
 
     def pr(self):
         print self.count
+
+    def printr(self):
+        k = 0
+        for i in self.z:
+            if i > 1 or i < -1:
+                k += 1
+        print k

@@ -23,6 +23,7 @@ class Valid:
 
     def _loss(self, learner, data):
         loss = 0
+        learner.printr()
         for (x1, y1) in data:
             p1 = learner.valid(x1)
             loss += logloss(sum(p1)/len(p1), y1)
