@@ -6,38 +6,14 @@
 """
 
 __revision__ = '0.1'
-import logging
-import logging.config
-from datetime import datetime
+
+from config import *
 from learner import *
 from read import *
 from valid import *
 from ensemble import *
-import sys
 
-logging.config.fileConfig("log.conf")
-where=sys.argv[1]
-
-TEST_MODE = 0
-dir = "../data/"
-newstam = datetime.now().strftime('%d-%H-%M-%S')
 valid = Valid()
-if TEST_MODE:
-    train = dir + 'train1028.rand'              # path to training file
-    test1 = dir + 'valid1030'                 # path to testing file
-    test2 = dir + 'valid1029'                # path to testing file
-    LOG_FILE = 'logtrain/tst.log' + newstam
-    epoch = 1       # learn training data for N passes
-else:
-    train = dir + 'train'              # path to training file
-    test = dir + 'test'               # path to testing file
-    LOG_FILE = 'logsub/tst.log' + newstam
-    epoch = 3       # learn training data for N passes
-
-handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
-logger = logging.getLogger("example")
-logger.addHandler(handler)
-
 # start training #############################################################
 start = datetime.now()
 # initialize ourselves a learner
@@ -62,6 +38,7 @@ for e in xrange(epoch):
 
             logger.info('[%s] Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f], elapsed time: %s' % (where, e, count, date, loss/count, l1, l2, lx, str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
+            learner.pr()
 
     logger.info('[%s] Epoch %d finished, validation logloss: %f, elapsed time: %s' % (where, e, loss/count, str(datetime.now() - start)))
 
@@ -83,6 +60,8 @@ def predictR(testfile, submission):
                 count += 1
                 if count % 50000 == 0:
                     logger.info('[%s]validation[%s] logloss: %f, elapsed time: %s' % (where, testfile, loss/count, str(datetime.now() - start)))
+
+        learner.pr()
     logger.info('[%s]VVvalidation[%s] logloss: %f, elapsed time: %s' % (where, testfile, loss/count, str(datetime.now() - start)))
 
 learner.pr()

@@ -145,4 +145,4 @@ class ftrl_proximal(object):
         for i in self.z:
             if i > 1 or i < -1:
                 k += 1
-        print k
+        return k

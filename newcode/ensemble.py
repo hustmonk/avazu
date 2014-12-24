@@ -25,19 +25,26 @@ class Ensemble():
             return self.p2
 
     def update(self, x, y):
+        self.lc = 0
+        self.mc = 0
         self.learnMore.update(x.data, self.p1, y, x.weight)
         self.learnLess.update(x.data, self.p2, y, x.weight)
 
     def valid(self, x):
         if x.isMore:
+            self.mc += 1
             return [self.learnMore.predict(x.data)]
         else:
+            self.lc += 1
             return [self.learnLess.predict(x.data)]
 
     def pr(self):
-        self.learnMore.pr()
-        self.learnLess.pr()
+        #self.learnMore.pr()
+        #self.learnLess.pr()
+
+        logger.info("MC:[m]%d [l]%d [mf] %d [lf] %d" % (self.mc, self.lc, self.learnMore.printr(), self.learnLess.printr()))
+        self.mc = 0
+        self.lc = 0
 
     def printr(self):
-        self.learnMore.printr()
-        self.learnLess.printr()
+        self.pr()

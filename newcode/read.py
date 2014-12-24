@@ -39,7 +39,7 @@ class Feature:
             self.data.append(index)
         if cckey < 0:
             cckey = -cckey
-        if cckey < 10:
+        if cckey < 100:
             self.isMore = False
         else:
             self.isMore = True

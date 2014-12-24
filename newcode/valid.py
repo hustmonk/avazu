@@ -5,6 +5,7 @@
 """docstring
 """
 from read import *
+from config import *
 
 __revision__ = '0.1'
 
