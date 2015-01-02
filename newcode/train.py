@@ -69,4 +69,4 @@ if TEST_MODE:
     predictR(test1, "sub1.csv")
     predictR(test2, "sub2.csv")
 else:
-    predictR(test, "sub.csv")
+    predictR(test, "sub.csv" + where)

@@ -22,10 +22,11 @@ class Denesy():
                 self.counts[arr[0]] = -int(arr[1])
             else:
                 self.counts[arr[0]] = int(arr[1])
-            self.indexs[arr[0]] = len(self.indexs)
+            #self.indexs[arr[0]] = len(self.indexs)
 
     def getNum(self, head, v):
-        key = head + "_" + v
+        #key = head + "_" + v
+        key = v + "_" + head
         c = self.counts.get(key, -1)
         #if c > 100:
         #    c = 101

@@ -7,13 +7,14 @@
 from config import *
 __revision__ = '0.1'
 import logging
+import sys
 import logging.config
 logging.config.fileConfig("log.conf")
 LOG_FILE = 'logtrain/mtst.log'
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5)
 logger = logging.getLogger("example")
 logger.addHandler(handler)
-fin = open("sub.csv")
+fin = open("sub.csv"+sys.argv[1])
 head = fin.next()
 loss = 0
 fout = open("subx.csv", "w")

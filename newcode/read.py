@@ -32,7 +32,7 @@ class Feature:
         row['hour'] = row['hour'][6:]
         for (key,value) in row.items():
             # one-hot encode everything with hash trick
-            if denesy.getNum(key, value) < 10:
+            if key[0] != 'C' and denesy.getNum(key, value) < 10:
                 index = abs(hash(xy + key)) % D
             else:
                 index = abs(hash(xy + "_" + key + '_' + value)) % D
