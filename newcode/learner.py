@@ -125,7 +125,12 @@ class ftrl_proximal(object):
 
         # gradient under logloss
         g = p - y
-        dropout = 0.9
+        dropout = 0.6
+        ws = 1
+        """
+        if y == 0:
+            ws = 1 / dropout
+        """
 
         # update z and n
         for (i, wi) in w:
@@ -134,8 +139,8 @@ class ftrl_proximal(object):
                 continue
             """
             sigma = (sqrt(n[i] + g * g) - sqrt(n[i])) / alpha
-            z[i] += (g - sigma * wi) * weight
-            n[i] += (g * g) * weight
+            z[i] += (g - sigma * wi) * weight * ws
+            n[i] += (g * g) * weight * ws
 
     def pr(self):
         print self.count

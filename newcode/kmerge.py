@@ -14,7 +14,9 @@ handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, b
 logger = logging.getLogger("example")
 logger.addHandler(handler)
 files = ["sub.csvapp_id", "sub.csvsite_id", "sub.csvC1", "sub.csvbanner_pos"]
-files = ["sub.csvapp_id", "sub.csvsite_id", "sub.csvbanner_pos"]
+files = ["sub.csvsite_id.bak", "sub.csvapp_id", "sub.csvsite_id", "sub.csvbanner_pos"]
+weights = [2, 2, 1.5, 1]
+
 fins = []
 for f in files:
     fin = open(f)
@@ -27,15 +29,11 @@ import math
 for line in fins[0]:
     arr = line.strip().split(",")
     y = int(arr[1])
-    weights = 2
     pred = float(arr[3]) * float(arr[3])
     for i in range(1, len(fins)):
         fin = fins[i]
         arr = fin.next().strip().split(",")
-        if i == 1:
-            pred = pred * float(arr[3]) * float(arr[3])
-        else:
-            pred = pred * float(arr[3])
-    pred = math.pow(pred, 1.0/5)
+        pred = pred * (math.pow(float(arr[3]), weights[i]))
+    pred = math.pow(pred, 1.0/(sum(weights)))
     fout.write("%s,%f\n" % (arr[0], pred))
 fout.close()

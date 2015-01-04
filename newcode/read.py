@@ -27,7 +27,8 @@ class Feature:
         self.data = [0]
         quKey = sys.argv[1]
         cckey = denesy.getNum(quKey, row[quKey])
-        xy = getBiFeature(quKey, cckey)
+        apkey = denesy.getNum("app_id", row["app_id"])
+        xy = getBiFeature(quKey, cckey) + getBiFeature("app_id", apkey)
         self.dayIndex = int(row['hour'][4:6])-21
         row['hour'] = row['hour'][6:]
         for (key,value) in row.items():
@@ -45,8 +46,10 @@ class Feature:
             self.isMore = True
         self.weight = math.sqrt(1.0 / cckey)
 
+import random
 def data(path, D, train):
     cc = 0
+    dropout = 0.6
     for t, row in enumerate(DictReader(open(path))):
         cc += 1
         # process id
@@ -58,6 +61,11 @@ def data(path, D, train):
         if 'click' in row:
             if row['click'] == '1':
                 y = 1.
+            """
+            else:
+                if train and random.random() > dropout:
+                    continue
+            """
             del row['click']
 
         # extract date
