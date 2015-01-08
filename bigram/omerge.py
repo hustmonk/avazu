@@ -15,8 +15,8 @@ logger = logging.getLogger("example")
 logger.addHandler(handler)
 files = ["sub.csvapp_id", "sub.csvsite_id", "sub.csvC1", "sub.csvbanner_pos"]
 files = ["sub.csvsite_id.bak", "sub.csvapp_id", "sub.csvsite_id.app_id", "sub.csvbanner_pos"]
-#files = ["sub.csvC1", "sub.csvC15", "sub.csvC16", "sub.csvC18", "sub.csvC20"]
-weights = [2, 2, 2, 1]
+files = ["sub.csvC1", "sub.csvC15", "sub.csvC16", "sub.csvC18", "sub.csvC20"]
+weights = [1, 1, 1, 1, 1]
 
 fins = []
 for f in files:
@@ -37,9 +37,9 @@ for line in fins[0]:
         arr = fin.next().strip().split(",")
         preds.append(float(arr[3]))
         pred = pred * math.pow(float(arr[3]), weights[i])
-    mpred = max(preds)
-    minpred = min(preds)
-    pred = pred * (mpred+0.0000001) * (mpred+0.0000001)/(minpred+0.0000001)
-    pred = math.pow(pred, 1.0/(sum(weights) + 1))
+    #mpred = max(preds)
+    #minpred = min(preds)
+    #pred = pred * (mpred+0.0000001) * (mpred+0.0000001)/(minpred+0.0000001)
+    pred = math.pow(pred, 1.0/(sum(weights)))
     fout.write("%s,%f\n" % (arr[0], pred))
 fout.close()
