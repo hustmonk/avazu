@@ -49,4 +49,4 @@ class Ensemble():
         self.lc = 0
 
     def printr(self):
-        self.pr()
+        return self.learnMore.printr()

@@ -31,7 +31,7 @@ from datetime import datetime
 logging.config.fileConfig("log.conf")
 where=sys.argv[1]
 
-TEST_MODE = 0
+TEST_MODE = 1
 dir = "../data/"
 newstam = datetime.now().strftime('%d-%H-%M-%S')
 if TEST_MODE:

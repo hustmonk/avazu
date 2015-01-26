@@ -33,10 +33,12 @@ for e in xrange(epoch):
 
         if count % 200000 == 0:
             l1,l2,lx = 0,0,0
+            k = 0
             if TEST_MODE:
                 l1,l2,lx = valid.loss(learner)
+                k = learner.printr()
 
-            logger.info('[%s] Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f], elapsed time: %s' % (where, e, count, date, loss/count, l1, l2, lx, str(datetime.now() - start)))
+            logger.info('[%s] Epoch %d finished[%d][%d], validation logloss: [%f], test : [%f][%f][%f]k[%d], elapsed time: %s' % (where, e, count, date, loss/count, l1, l2, lx, k, str(datetime.now() - start)))
             # step 2-2, update learner with label (click) information
             learner.pr()
 

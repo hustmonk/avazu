@@ -28,14 +28,10 @@ class Feature:
         quKey = sys.argv[1]
         cckey = denesy.getNum(quKey, row[quKey])
 
-        """
-        #apkey = denesy.getNum("app_id", row["app_id"])
-        kk = "app_category"
-        apkey = denesy.getNum(kk, row[kk])
-        xy = getBiFeature(quKey, cckey) + getBiFeature(kk, apkey)
-        """
-
-        xy = getBiFeature(quKey, cckey)
+        quKey2 = sys.argv[2]
+        apkey = denesy.getNum(quKey2, row[quKey2])
+        xy = getBiFeature(quKey, cckey) + getBiFeature(quKey2, apkey)
+        #xy = getBiFeature(quKey, cckey)
         self.dayIndex = int(row['hour'][4:6])-21
         row['hour'] = row['hour'][6:]
         for (key,value) in row.items():

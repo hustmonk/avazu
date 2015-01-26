@@ -12,7 +12,7 @@ __revision__ = '0.1'
 alpha = .1  # learning rate
 beta = 1.   # smoothing parameter for adaptive learning rate
 L1 = 1.     # L1 regularization, larger value means more regularized
-L2 = 1.     # L2 regularization, larger value means more regularized
+L2 = 0.5     # L2 regularization, larger value means more regularized
 
 class ftrl_proximal(object):
     ''' Our main algorithm: Follow the regularized leader - proximal
@@ -83,10 +83,10 @@ class ftrl_proximal(object):
             # we are doing this at prediction instead of update time is because
             # this allows us for not storing the complete w
             wi = 0
-            if sign * z[i] > L1:
                 # apply prediction time L1, L2 regularization to z and get w
-                wi = (sign * L1 - z[i]) / ((beta + sqrt(n[i])) / alpha + L2)
+            wi = (sign * L1 - z[i]) / ((beta + sqrt(n[i])) / alpha + L2)
 
+            #if sign * z[i] > L1:
             wTx += wi
             w[idx] = [i, wi]
 

@@ -26,18 +26,10 @@ class Feature:
     def __init__(self, row):
         self.data = [0]
         quKey = sys.argv[1]
+
         cckey = denesy.getNum(quKey, row[quKey])
-
-        """
-        #apkey = denesy.getNum("app_id", row["app_id"])
-        kk = "app_category"
-        apkey = denesy.getNum(kk, row[kk])
-        xy = getBiFeature(quKey, cckey) + getBiFeature(kk, apkey)
-        """
-
         xy = getBiFeature(quKey, cckey)
-        self.dayIndex = int(row['hour'][4:6])-21
-        row['hour'] = row['hour'][6:]
+
         for (key,value) in row.items():
             # one-hot encode everything with hash trick
             if key[0] != 'C' and denesy.getNum(key, value) < 10:
@@ -77,6 +69,5 @@ def data(path, D, train):
 
         # extract date
 
-        date = int(row['hour'][4:6])
         x = Feature(row)
-        yield t, date, ID, x, y
+        yield t, 1, ID, x, y

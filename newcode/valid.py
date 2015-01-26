@@ -11,7 +11,7 @@ __revision__ = '0.1'
 
 class Valid:
     def __init__(self):
-        dir = "../data/"
+        dir = "../newv/"
         debug1 = dir + 'debug1030'
         debug2 = dir + 'debug1029'
         self.valid_test_2 = []

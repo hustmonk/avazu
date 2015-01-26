@@ -32,7 +32,7 @@ logging.config.fileConfig("log.conf")
 where=sys.argv[1]
 
 TEST_MODE = 0
-dir = "../data/"
+dir = "../newv/"
 newstam = datetime.now().strftime('%d-%H-%M-%S')
 if TEST_MODE:
     train = dir + 'train1028.rand'              # path to training file
@@ -42,6 +42,7 @@ if TEST_MODE:
     epoch = 1       # learn training data for N passes
 else:
     train = dir + 'train'              # path to training file
+
     test = dir + 'test'               # path to testing file
     LOG_FILE = 'logsub/tst.log' + newstam
     epoch = 3       # learn training data for N passes
