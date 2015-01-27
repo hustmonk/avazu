@@ -71,3 +71,10 @@ def data(path, D, train):
 
         x = Feature(row)
         yield t, 1, ID, x, y
+if __name__ == "__main__":
+    count = 0
+    for t, date, ID, x, y in data(train, D, True):
+        if count > 1000:
+            break
+        count += 1
+        print t
