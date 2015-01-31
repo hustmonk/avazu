@@ -35,7 +35,7 @@ class Feature:
         xy = getBiFeature(quKey, cckey) + getBiFeature(kk, apkey)
         """
 
-        xy = getBiFeature(quKey, cckey)
+        xy = getBiFeature(quKey, cckey) + row["banner_pos"] + row["device_type"] + row["device_conn_type"]
         self.dayIndex = int(row['hour'][4:6])-21
         row['hour'] = row['hour'][6:]
         for (key,value) in row.items():
